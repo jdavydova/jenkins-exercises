@@ -5,7 +5,6 @@
 ##### Test
 The project uses jest library for tests. (see "test" script in package.json)
 There is 1 test (server.test.js) in the project that checks whether the main index.html file exists in the project. 
-
 To run the nodejs test:
 
     npm run test
@@ -15,7 +14,8 @@ Make sure to download jest library before running test, otherwise jest command d
     npm install
 
 In order to see failing test, remove index.html or rename it and run tests.
-🔸 [EXERCISE 1: Dockerize your NodeJS App]
+
+🔸 [EXERCISE 1: Dockerize your NodeJS App](Dockerfile)
 
     Configure your application to be built as a Docker image.
 
@@ -30,7 +30,7 @@ In order to see failing test, remove index.html or rename it and run tests.
         git remote add origin git@github.com:jdavydova/jenkins-exercises.git
         git push -u origin main
 
-    Created [Dockerfile](https://github.com/jdavydova/jenkins-exercises/blob/main/Dockerfile)
+    Created [Dockerfile](Dockerfile)
 
         FROM node:20-alpine
 
@@ -53,6 +53,7 @@ In order to see failing test, remove index.html or rename it and run tests.
     Open:
 
         http://localhost:3000
+
 
     
     
