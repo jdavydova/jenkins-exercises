@@ -29,8 +29,8 @@ In order to see failing test, remove index.html or rename it and run tests.
         git commit -m "first commit"
         git remote add origin git@github.com:jdavydova/jenkins-exercises.git
         git push -u origin main
-
-    Created [Dockerfile](Dockerfile)
+        
+   Create [Dockerfile](https://github.com/jdavydova/jenkins-exercises/blob/main/Dockerfile)
 
         FROM node:20-alpine
 
