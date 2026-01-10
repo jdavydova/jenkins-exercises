@@ -49,11 +49,84 @@ In order to see failing test, remove index.html or rename it and run tests.
         docker build -t my-node-app .
         docker run -d -p 3000:3000 --name my-node-app my-node-app
 
-    Test in browser.
+    Test in browser](http://localhost:3000)
     Open:
 
         http://localhost:3000
 
+🔸 [EXERCISE 2: Create a full pipeline for your NodeJS App]
+
+You want the following steps to be included in your pipeline:
+
+Increment version
+The application's version and docker image version should be incremented.
+
+TIP: Ensure to add —no-git-tag-version to the npm version minor command in your Jenkinsfile to avoid any commit errors
+
+Run tests
+You want to test the code, to be sure to deploy only working code. When tests fail, the pipeline should abort.
+
+Build docker image with incremented version
+Push to Docker repository
+Commit to Git
+The application version increment must be committed and pushed to a remote Git repository.
+
+### Create Jenkins Credentials
+
+Create usernamePassword credentials for docker registry called docker-credentials
+Create usernamePassword credentials for git repository called gitlab-credentials
+
 
     
-    
+## Notes:  \
+
+✅ Option A (RECOMMENDED): Install Docker client via docker.io
+
+This is the simplest and fastest way.
+
+1️⃣ Create / edit Dockerfile
+
+    FROM jenkins/jenkins:lts
+
+    USER root
+    RUN apt-get update && \
+        apt-get install -y docker.io curl libatomic1 && \
+        rm -rf /var/lib/apt/lists/*
+
+    USER jenkins
+
+2️⃣ Build the image
+
+Run on the host, in the directory with the Dockerfile:
+
+    docker build -t jenkins-docker .
+
+3️⃣ Recreate Jenkins container (IMPORTANT)
+
+You must remove the old container — otherwise changes do nothing.
+
+    docker stop jenkins
+    docker rm jenkins
+
+
+Run Jenkins with Docker socket mounted:
+
+    docker run -d --name jenkins \
+      -p 8080:8080 -p 50000:50000 \
+      -v jenkins_home:/var/jenkins_home \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      jenkins-docker
+
+4️⃣ Verify (this MUST work)
+
+    docker exec -it jenkins bash -lc "which docker && docker version"
+
+
+Expected output:
+
+    /usr/bin/docker
+
+Docker client version info
+
+<img width="1284" height="804" alt="Screenshot 2026-01-10 at 12 53 15 PM" src="https://github.com/user-attachments/assets/9fcf8456-2656-4a85-8632-bac541d51706" />
+
