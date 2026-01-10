@@ -74,7 +74,85 @@ The application version increment must be committed and pushed to a remote Git r
 ### Create Jenkins Credentials
 
 Create usernamePassword credentials for docker registry called docker-credentials
-Create usernamePassword credentials for git repository called gitlab-credentials
+
+Create usernamePassword credentials for git repository called github-credentials
+
+### Create Jenkinsfile
+
+pipeline {
+    agent any
+
+    tools {
+        nodejs "my-nodejs"
+    }
+
+    environment {
+        DOCKER_IMAGE = "juliadavydova/my-app"
+    }
+
+    stages {
+
+        stage('increment version') {
+            steps {
+                dir("app") {
+                    // install deps so npm can update package-lock.json correctly (and scripts can run)
+                    sh "npm install"
+
+                    // IMPORTANT: use two normal hyphens, not the long dash character
+                    sh "npm version minor --no-git-tag-version"
+
+                    script {
+                        def packageJson = readJSON file: 'package.json'
+                        def version = packageJson.version
+                        env.IMAGE_NAME = "${version}-${env.BUILD_NUMBER}"
+                        echo "IMAGE_NAME set to: ${env.IMAGE_NAME}"
+                    }
+                }
+            }
+        }
+
+        stage('Run tests') {
+            steps {
+                dir("app") {
+                    sh "npm test"
+                }
+            }
+        }
+
+        stage('Build and Push docker image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh '''
+                        set -e
+                        echo "$PASS" | docker login -u "$USER" --password-stdin
+                        docker build -t ${DOCKER_IMAGE}:${IMAGE_NAME} .
+                        docker push ${DOCKER_IMAGE}:${IMAGE_NAME}
+                    '''
+                }
+            }
+        }
+
+        stage('commit version update') {
+             steps {
+                withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh '''
+                        set -e
+
+                        git config user.email "jenkins@example.com"
+                        git config user.name "jenkins"
+
+                         git remote set-url origin https://$USER:$PASS@github.com/jdavydova/jenkins-exercises.git
+
+                         git add app/package.json app/package-lock.json || true
+                         git diff --cached --quiet || git commit -m "ci: version bump to ${IMAGE_NAME}"
+
+                         git push origin HEAD:jenkins-jobs
+                    '''
+                }
+             }
+        }
+    }
+}
 
 
     
@@ -129,4 +207,18 @@ Expected output:
 Docker client version info
 
 <img width="1284" height="804" alt="Screenshot 2026-01-10 at 12 53 15 PM" src="https://github.com/user-attachments/assets/9fcf8456-2656-4a85-8632-bac541d51706" />
+
+<img width="1460" height="843" alt="Screenshot 2026-01-10 at 1 04 54 PM" src="https://github.com/user-attachments/assets/48a0e793-94af-4c98-af65-64ea657802b5" />
+
+<img width="952" height="568" alt="Screenshot 2026-01-10 at 1 03 56 PM" src="https://github.com/user-attachments/assets/6a582a25-1433-4b4a-bef6-6e097d249185" />
+
+
+
+🔸 [EXERCISE 3: Manually deploy new Docker Image on server]
+
+After the pipeline has run successfully, you:
+
+Manually deploy the new docker image on the droplet server.
+
+
 
