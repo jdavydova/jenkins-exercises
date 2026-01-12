@@ -221,4 +221,33 @@ After the pipeline has run successfully, you:
 Manually deploy the new docker image on the droplet server.
 
 
+    ssh root@164.92.182.1
+
+Add to Inbound Rules port 3000:
+
+    <img width="858" height="240" alt="Screenshot 2026-01-12 at 10 32 28 AM" src="https://github.com/user-attachments/assets/187b00af-e0b0-4fc4-8457-48971126abef" />
+
+
+To sign in with credentials on the command line, use 'docker login -u <username>'
+
+    root@ubuntu-s-2vcpu-4gb-fra1-01:~# docker login -u juliadavydova
+
+    docker run -d --name my-app \
+      -p 3000:3000 \
+      --restart unless-stopped \
+      juliadavydova/my-app:1.1.0-8
+
+    docker logs -f my-app
+
+Open browser:
+
+    http://164.92.182.1:3000/
+
+    <img width="873" height="653" alt="Screenshot 2026-01-12 at 10 33 58 AM" src="https://github.com/user-attachments/assets/d1d2a602-2c45-43ec-88a3-beab6e89cba0" />
+
+
+
+
+
+
 
