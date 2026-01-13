@@ -1,17 +1,38 @@
 @Library('jenkins-shared-library') _
 
 pipeline {
-  agent any
-  stages {
-    stage('Docker') {
-      steps {
-        script {
-          def image = "juliadavydova/my-app:${env.BUILD_NUMBER}"
-          dockerLogin('docker-credentials')
-          buildImage(image)
-          dockerPush(image)
-        }
-      }
+    agent any
+    environment {
+        DOCKER_IMAGE = "juliadavydova/my-app"
     }
-  }
+    stages {
+        stage('increment version') {
+            steps {
+                dir("app") {
+                    // install deps so npm can update package-lock.json correctly (and scripts can run)
+                    sh "npm install"
+
+                    // IMPORTANT: use two normal hyphens, not the long dash character
+                    sh "npm version minor --no-git-tag-version"
+
+                    script {
+                        def packageJson = readJSON file: 'package.json'
+                        def version = packageJson.version
+                        env.IMAGE_NAME = "${version}-${env.BUILD_NUMBER}"
+                        echo "IMAGE_NAME set to: ${env.IMAGE_NAME}"
+                    }
+                }
+            }
+        }
+        stage('Docker') {
+            steps {
+                script {
+                    def image = "${DOCKER_IMAGE}:${env.IMAGE_NAME}"
+                    dockerLogin('docker-credentials')
+                    buildImage(image)
+                    dockerPush(image)
+                }
+             }
+        }
+    }
 }
