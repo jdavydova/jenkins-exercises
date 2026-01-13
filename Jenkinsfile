@@ -5,7 +5,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = "juliadavydova/my-app"
     }
-
+    tools {
+        nodejs "my-nodejs"
+    }
     stages {
         stage('increment version') {
             agent {
