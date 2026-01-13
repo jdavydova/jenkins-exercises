@@ -10,13 +10,6 @@ pipeline {
     }
     stages {
         stage('increment version') {
-            agent {
-                docker {
-                    image 'node:20-bullseye'
-                    // optional: avoids permission issues on workspace files
-                    args '-u root:root'
-                }
-            }
             steps {
                 dir("app") {
                     sh "npm ci"
@@ -32,7 +25,7 @@ pipeline {
             }
         }
 
-        stage('Docker') {
+        stage('Build and Push docker image') {
             steps {
                 script {
                     def image = "${DOCKER_IMAGE}:${env.IMAGE_NAME}"
