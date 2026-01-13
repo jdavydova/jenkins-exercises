@@ -245,6 +245,59 @@ Open browser:
 
 <img width="873" height="653" alt="Screenshot 2026-01-12 at 10 33 58 AM" src="https://github.com/user-attachments/assets/d1d2a602-2c45-43ec-88a3-beab6e89cba0" />
 
+🔸 [EXERCISE 4: Extract into Jenkins Shared Library]
+
+
+A colleague from another project tells you that they are building a similar Jenkins pipeline and they could use some of your logic. So you suggest creating a Jenkins Shared Library to make your Jenkinsfile code reusable and shareable.
+
+Therefore, you do the following:
+
+Extract all logic into Jenkins-shared-library with parameters and reference it in Jenkinsfile.
+
+Jenkinsfile:
+
+    @Library('jenkins-shared-library') _
+
+    pipeline {
+        agent any
+        environment {
+            DOCKER_IMAGE = "juliadavydova/my-app"
+        }
+        tools {
+            nodejs "my-nodejs"
+        }
+        stages {
+            stage('increment version') {
+                steps {
+                    dir("app") {
+                        sh "npm ci"
+                        sh "npm version minor --no-git-tag-version"
+    
+                        script {
+                            def packageJson = readJSON file: 'package.json'
+                            def version = packageJson.version
+                            env.IMAGE_NAME = "${version}-${env.BUILD_NUMBER}"
+                            echo "IMAGE_NAME set to: ${env.IMAGE_NAME}"
+                        }
+                    }
+                }
+            }
+    
+            stage('Build and Push docker image') {
+                steps {
+                    script {
+                        def image = "${DOCKER_IMAGE}:${env.IMAGE_NAME}"
+                        dockerLogin('docker-credentials')
+                        buildImage(image)
+                        dockerPush(image)
+                    }
+                }
+            }
+        }
+    }
+
+
+<img width="1009" height="585" alt="Screenshot 2026-01-13 at 10 56 51 AM" src="https://github.com/user-attachments/assets/a97c7c0a-41a8-4260-bdd0-4254072ed125" />
 
 
 
