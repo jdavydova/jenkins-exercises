@@ -5,14 +5,19 @@ pipeline {
     environment {
         DOCKER_IMAGE = "juliadavydova/my-app"
     }
+
     stages {
         stage('increment version') {
+            agent {
+                docker {
+                    image 'node:20-bullseye'
+                    // optional: avoids permission issues on workspace files
+                    args '-u root:root'
+                }
+            }
             steps {
                 dir("app") {
-                    // install deps so npm can update package-lock.json correctly (and scripts can run)
-                    sh "npm install"
-
-                    // IMPORTANT: use two normal hyphens, not the long dash character
+                    sh "npm ci"
                     sh "npm version minor --no-git-tag-version"
 
                     script {
@@ -24,6 +29,7 @@ pipeline {
                 }
             }
         }
+
         stage('Docker') {
             steps {
                 script {
@@ -32,7 +38,7 @@ pipeline {
                     buildImage(image)
                     dockerPush(image)
                 }
-             }
+            }
         }
     }
 }
