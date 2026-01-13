@@ -49,7 +49,7 @@ In order to see failing test, remove index.html or rename it and run tests.
         docker build -t my-node-app .
         docker run -d -p 3000:3000 --name my-node-app my-node-app
 
-    Test in browser](http://localhost:3000)
+    [Test in browser](http://localhost:3000)
     Open:
 
         http://localhost:3000
@@ -254,6 +254,8 @@ Therefore, you do the following:
 
 Extract all logic into Jenkins-shared-library with parameters and reference it in Jenkinsfile.
 
+[Jenkins Shared Library]:(https://github.com/jdavydova/jenkins-shared-library) 
+
 Jenkinsfile:
 
     @Library('jenkins-shared-library') _
@@ -296,8 +298,10 @@ Jenkinsfile:
         }
     }
 
+<img width="1309" height="688" alt="Screenshot 2026-01-13 at 11 44 14 AM" src="https://github.com/user-attachments/assets/310bd369-fdae-4550-94a1-801d31291af5" />
 
-<img width="1009" height="585" alt="Screenshot 2026-01-13 at 10 56 51 AM" src="https://github.com/user-attachments/assets/a97c7c0a-41a8-4260-bdd0-4254072ed125" />
+
+<img width="963" height="655" alt="Screenshot 2026-01-13 at 11 44 35 AM" src="https://github.com/user-attachments/assets/1b7dd935-dfc5-4d29-9ecc-19fb52b97800" />
 
 
 
